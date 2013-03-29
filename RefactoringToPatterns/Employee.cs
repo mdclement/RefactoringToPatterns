@@ -18,18 +18,22 @@ namespace RefactoringToPatterns
             const decimal baseSalary = 10000m;
             const decimal commission = 5000m;
             const decimal bonus = 20000m;
-            var employee = new Employee(employeeType) { BaseSalary = baseSalary, Commission = commission, Bonus = bonus };
+            const decimal healthPremium = 0m;
+            var employee = new Employee(employeeType, baseSalary, commission, bonus, healthPremium);
             decimal paycheck = employee.GetGrossPaycheck();
             Assert.That(paycheck, Is.EqualTo(expectedPaycheck));
         }
 
         [TestCase(EmployeeType.Minion, 1000)]
         [TestCase(EmployeeType.CoinOperated, 500)]
-        [TestCase(EmployeeType.Overlord, 100)]
+        [TestCase(EmployeeType.Overlord, 500)]
         public void BenefitDeductions(EmployeeType employeeType, decimal expectedDeduction)
         {
+            const decimal baseSalary = 0m;
+            const decimal commission = 0m;
+            const decimal bonus = 0m;
             const decimal healthPremium = 1000m;
-            var employee = new Employee(employeeType) {HealthPremium = healthPremium};
+            var employee = new Employee(employeeType, baseSalary, commission, bonus, healthPremium);
             decimal deduction = employee.GetDeductionTotal();
             Assert.That(deduction, Is.EqualTo(expectedDeduction));
         }
@@ -51,9 +55,17 @@ namespace RefactoringToPatterns
 
         public decimal HealthPremium { get; set; }
 
-        public Employee(EmployeeType employeeType)
+        public Employee(EmployeeType employeeType,
+                        decimal baseSalary,
+                        decimal commission,
+                        decimal bonus,
+                        decimal healthPremium)
         {
             EmployeeType = employeeType;
+            BaseSalary = baseSalary;
+            Commission = commission;
+            Bonus = bonus;
+            HealthPremium = healthPremium;
         }
 
         public decimal GetGrossPaycheck()
@@ -78,9 +90,9 @@ namespace RefactoringToPatterns
                 case EmployeeType.Minion:
                     return HealthPremium;
                 case EmployeeType.CoinOperated:
-                    return HealthPremium * .5m;
+                    return HealthPremium*.5m;
                 case EmployeeType.Overlord:
-                    return HealthPremium * .1m;
+                    return HealthPremium*.5m;
                 default:
                     return 0;
             }
